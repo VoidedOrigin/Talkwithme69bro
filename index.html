@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Talk With Me</title>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
   :root {
     --bg: #0b0f19;
@@ -30,10 +31,7 @@
     line-height: 1.5;
   }
 
-  main {
-    max-width: 1100px;
-    margin: 0 auto;
-  }
+  main { max-width: 1100px; margin: 0 auto; }
 
   .card {
     background: var(--card);
@@ -44,19 +42,8 @@
     box-shadow: 0 4px 24px rgba(0,0,0,0.25);
   }
 
-  h1 {
-    font-size: 1.6rem;
-    font-weight: 700;
-    margin-bottom: 6px;
-  }
-
-  h2 {
-    font-size: 1.15rem;
-    font-weight: 600;
-    margin-bottom: 12px;
-    color: #e2e8f0;
-  }
-
+  h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 6px; }
+  h2 { font-size: 1.15rem; font-weight: 600; margin-bottom: 12px; color: #e2e8f0; }
   p { color: var(--muted); margin-bottom: 10px; }
   .small { font-size: 0.85rem; color: var(--muted); }
 
@@ -70,23 +57,24 @@
     font: inherit;
     transition: border-color 0.15s;
   }
-
-  input:focus, textarea:focus {
-    outline: none;
-    border-color: var(--accent);
-  }
+  input:focus, textarea:focus { outline: none; border-color: var(--accent); }
 
   textarea {
-    min-height: 120px;
+    min-height: 70px;
     resize: vertical;
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 0.85rem;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    text-align: center;
   }
 
-  /* Smaller friend code box */
   #friendCode {
-    min-height: 64px;
-    height: 64px;
+    min-height: 52px;
+    height: 52px;
+    font-size: 1.3rem;
+    letter-spacing: 3px;
+    text-align: center;
+    text-transform: uppercase;
   }
 
   button {
@@ -103,32 +91,18 @@
     align-items: center;
     gap: 6px;
   }
-
   button:hover:not(:disabled) { background: var(--accent-hover); }
   button:active:not(:disabled) { transform: scale(0.97); }
   button:disabled { opacity: 0.45; cursor: not-allowed; }
 
   button.secondary { background: #2d3748; }
   button.secondary:hover:not(:disabled) { background: #3d4a5f; }
-
   button.danger { background: var(--danger); }
   button.danger:hover:not(:disabled) { background: var(--danger-hover); }
-
   button.success { background: var(--success); }
 
-  .controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 14px;
-  }
-
-  .row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
-
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .hidden { display: none !important; }
 
   .notice {
@@ -140,13 +114,8 @@
     font-size: 0.95rem;
   }
 
-  .status {
-    font-weight: 600;
-    color: #a5b4fc;
-    margin-bottom: 8px;
-  }
+  .status { font-weight: 600; color: #a5b4fc; margin-bottom: 8px; }
 
-  /* Videos */
   #videos {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -197,12 +166,8 @@
     border-radius: 8px;
     background: rgba(0,0,0,0.7);
   }
+  .video-actions button:hover { background: rgba(99,102,241,0.9); }
 
-  .video-actions button:hover {
-    background: rgba(99,102,241,0.9);
-  }
-
-  /* Chat */
   #chat {
     height: 240px;
     overflow-y: auto;
@@ -213,25 +178,30 @@
     border: 1px solid var(--border);
   }
 
-  .msg {
-    margin: 8px 0;
-    line-height: 1.4;
-  }
-
+  .msg { margin: 8px 0; line-height: 1.4; }
   .msg b { color: #a5b4fc; }
-
   .msg.system { color: var(--muted); font-style: italic; }
 
-  /* Gate */
   #gate {
     max-width: 420px;
     margin: 80px auto;
     text-align: center;
   }
-
   #gate input { text-align: center; margin: 16px 0; }
 
-  /* Responsive */
+  .big-id {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-align: center;
+    padding: 16px;
+    background: #0f1525;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin: 12px 0;
+    user-select: all;
+  }
+
   @media (max-width: 750px) {
     .row, #videos { grid-template-columns: 1fr; }
     body { padding: 12px; }
@@ -261,26 +231,27 @@
       <div class="controls">
         <button id="start">Start camera & mic</button>
         <button id="create">Create call</button>
-        <button id="join" class="secondary">Join with offer</button>
+        <button id="join" class="secondary">Join with code</button>
       </div>
     </div>
 
     <div class="card">
       <h2>Connection</h2>
-      <p class="small">This is a pure peer-to-peer page (no server). Exchange the codes manually between browsers.</p>
+      <p class="small">Share the short code with your friend. No long base64 needed.</p>
+
       <div class="row">
         <div>
           <p><b>Your code</b></p>
-          <textarea id="myCode" readonly placeholder="Your offer or answer will appear here"></textarea>
+          <div id="myCode" class="big-id">––––</div>
           <div class="controls">
             <button id="copy">Copy my code</button>
           </div>
         </div>
         <div>
           <p><b>Friend's code</b></p>
-          <textarea id="friendCode" placeholder="Paste your friend's code here"></textarea>
+          <input id="friendCode" placeholder="e.g. 4HA8" maxlength="6" autocomplete="off">
           <div class="controls">
-            <button id="apply">Apply friend's code</button>
+            <button id="apply">Join / Connect</button>
           </div>
         </div>
       </div>
@@ -294,14 +265,14 @@
           <video id="local" autoplay muted playsinline></video>
           <div class="video-label">You</div>
           <div class="video-actions">
-            <button id="fsLocal" title="Fullscreen">Fullscreen</button>
+            <button id="fsLocal">Fullscreen</button>
           </div>
         </div>
         <div class="video-wrap">
           <video id="remote" autoplay playsinline></video>
           <div class="video-label">Friend</div>
           <div class="video-actions">
-            <button id="fsRemote" title="Fullscreen">Fullscreen</button>
+            <button id="fsRemote">Fullscreen</button>
           </div>
         </div>
       </div>
@@ -330,17 +301,26 @@
 const PASSWORD = "talkwithme69bro";
 const $ = id => document.getElementById(id);
 
-let pc = null;
+let peer = null;
 let localStream = null;
-let dataChannel = null;
-let makingOffer = false;
-let pendingCandidates = [];
+let currentCall = null;
+let dataConn = null;
 let screenStream = null;
 let isScreenSharing = false;
+let myId = null;
 
 function setStatus(text) {
   $("status").textContent = text;
   $("connectionMsg").textContent = text;
+}
+
+function generateShortId(length = 4) {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no 0/O/1/I
+  let id = "";
+  for (let i = 0; i < length; i++) {
+    id += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return id;
 }
 
 $("enter").onclick = () => {
@@ -372,78 +352,67 @@ async function getMedia() {
   }
 }
 
-function createPeer() {
-  if (pc) return pc;
-
-  pc = new RTCPeerConnection({
-    iceServers: [
-      { urls: "stun:stun.l.google.com:19302" },
-      { urls: "stun:stun.cloudflare.com:3478" }
-    ]
-  });
-
-  if (localStream) {
-    localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+function createPeer(id) {
+  if (peer) {
+    peer.destroy();
+    peer = null;
   }
 
-  pc.ontrack = e => {
-    if (e.streams[0]) $("remote").srcObject = e.streams[0];
-    setStatus("Connected — you should now hear/see your friend.");
-  };
-
-  pc.onicecandidate = e => {
-    if (e.candidate) return;
-    if (pc.localDescription) {
-      $("myCode").value = encode(pc.localDescription);
-      setStatus("Your connection code is ready. Send it to your friend.");
-    }
-  };
-
-  pc.onconnectionstatechange = () => {
-    const s = pc.connectionState;
-    if (s === "connected") setStatus("Connected — call is live.");
-    else if (s === "connecting") setStatus("Connecting…");
-    else if (s === "disconnected") setStatus("Connection interrupted.");
-    else if (s === "failed") setStatus("Connection failed. Try creating a new call.");
-    else if (s === "closed") setStatus("Call ended.");
-  };
-
-  pc.ondatachannel = e => {
-    dataChannel = e.channel;
-    setupDataChannel();
-  };
-
-  return pc;
-}
-
-function encode(obj) {
-  return btoa(JSON.stringify(obj));
-}
-
-function decode(text) {
-  return JSON.parse(atob(text.trim()));
-}
-
-function waitForIceComplete() {
-  return new Promise(resolve => {
-    if (!pc || pc.iceGatheringState === "complete") {
-      resolve();
-      return;
-    }
-    const done = () => {
-      if (pc.iceGatheringState === "complete") {
-        pc.removeEventListener("icegatheringstatechange", done);
-        resolve();
-      }
-    };
-    pc.addEventListener("icegatheringstatechange", done);
-    setTimeout(resolve, 10000);
+  peer = new Peer(id, {
+    debug: 1
   });
+
+  peer.on("open", id => {
+    myId = id;
+    $("myCode").textContent = id;
+    setStatus("Your code is ready. Share it with your friend.");
+  });
+
+  peer.on("error", err => {
+    console.error(err);
+    if (err.type === "unavailable-id") {
+      // retry with new id
+      const newId = generateShortId();
+      createPeer(newId);
+    } else {
+      setStatus("Error: " + err.type);
+    }
+  });
+
+  // Incoming call
+  peer.on("call", async call => {
+    await getMedia();
+    call.answer(localStream);
+    currentCall = call;
+
+    call.on("stream", stream => {
+      $("remote").srcObject = stream;
+      setStatus("Connected — call is live.");
+    });
+
+    call.on("close", () => {
+      setStatus("Call ended.");
+      $("remote").srcObject = null;
+    });
+  });
+
+  // Incoming data connection (chat)
+  peer.on("connection", conn => {
+    dataConn = conn;
+    setupDataChannel(conn);
+  });
+}
+
+function setupDataChannel(conn) {
+  conn.on("open", () => {
+    setStatus("Connected — chat is ready.");
+  });
+  conn.on("data", data => addMessage("Friend", data));
+  conn.on("close", () => addMessage("System", "Chat disconnected."));
 }
 
 $("start").onclick = async () => {
   await getMedia();
-  createPeer();
   $("start").disabled = true;
   setStatus("Camera and microphone ready.");
 };
@@ -451,79 +420,77 @@ $("start").onclick = async () => {
 $("create").onclick = async () => {
   try {
     await getMedia();
-    createPeer();
-    dataChannel = pc.createDataChannel("chat");
-    setupDataChannel();
-    makingOffer = true;
-    const offer = await pc.createOffer();
-    await pc.setLocalDescription(offer);
-    setStatus("Preparing your call code…");
-    await waitForIceComplete();
-    $("myCode").value = encode(pc.localDescription);
-    makingOffer = false;
-    setStatus("Call code ready. Send it to your friend.");
+    const id = generateShortId(4);
+    createPeer(id);
+    setStatus("Creating your call code…");
   } catch (e) {
-    makingOffer = false;
-    alert("Could not create the call.");
+    alert("Could not start.");
   }
 };
 
 $("join").onclick = () => {
   $("friendCode").focus();
-  setStatus("Paste your friend's call code, then click Apply friend's code.");
+  setStatus("Type your friend's 4-character code, then click Join / Connect.");
 };
 
 $("apply").onclick = async () => {
-  try {
-    const desc = decode($("friendCode").value);
-    await getMedia();
-    createPeer();
+  const remoteId = $("friendCode").value.trim().toUpperCase();
+  if (!remoteId || remoteId.length < 3) {
+    alert("Enter a valid short code.");
+    return;
+  }
 
-    if (desc.type === "offer") {
-      await pc.setRemoteDescription(desc);
-      for (const c of pendingCandidates) {
-        try { await pc.addIceCandidate(c); } catch {}
-      }
-      pendingCandidates = [];
-      const answer = await pc.createAnswer();
-      await pc.setLocalDescription(answer);
-      setStatus("Preparing your answer code…");
-      await waitForIceComplete();
-      $("myCode").value = encode(pc.localDescription);
-      setStatus("Answer ready. Send your answer code back to the caller.");
-    } else if (desc.type === "answer") {
-      await pc.setRemoteDescription(desc);
-      for (const c of pendingCandidates) {
-        try { await pc.addIceCandidate(c); } catch {}
-      }
-      pendingCandidates = [];
-      setStatus("Connecting to your friend…");
-    } else {
-      throw new Error("Invalid type");
+  try {
+    await getMedia();
+
+    // Create our own peer (random short id)
+    if (!peer) {
+      createPeer(generateShortId(4));
+      // wait a moment for peer to open
+      await new Promise(r => setTimeout(r, 800));
     }
+
+    // Call the remote peer
+    const call = peer.call(remoteId, localStream);
+    currentCall = call;
+
+    call.on("stream", stream => {
+      $("remote").srcObject = stream;
+      setStatus("Connected — call is live.");
+    });
+
+    call.on("close", () => {
+      setStatus("Call ended.");
+      $("remote").srcObject = null;
+    });
+
+    // Also open a data connection for chat
+    dataConn = peer.connect(remoteId);
+    setupDataChannel(dataConn);
+
   } catch (e) {
-    alert("Invalid connection code. Copy the complete code and try again.");
+    console.error(e);
+    alert("Could not connect. Check the code and try again.");
   }
 };
 
 $("copy").onclick = async () => {
-  if (!$("myCode").value) return;
+  const code = $("myCode").textContent;
+  if (!code || code === "––––") return;
   try {
-    await navigator.clipboard.writeText($("myCode").value);
-    setStatus("Copied. Send the code to your friend.");
+    await navigator.clipboard.writeText(code);
+    setStatus("Copied! Send the code to your friend.");
   } catch {
-    $("myCode").select();
+    // fallback
+    const ta = document.createElement("textarea");
+    ta.value = code;
+    document.body.appendChild(ta);
+    ta.select();
     document.execCommand("copy");
+    document.body.removeChild(ta);
+    setStatus("Copied!");
   }
 };
-
-function setupDataChannel() {
-  if (!dataChannel) return;
-  dataChannel.onopen = () => setStatus("Connected — chat is ready.");
-  dataChannel.onclose = () => addMessage("System", "Chat disconnected.");
-  dataChannel.onerror = () => addMessage("System", "Chat error.");
-  dataChannel.onmessage = e => addMessage("Friend", e.data);
-}
 
 function addMessage(who, text) {
   const chat = $("chat");
@@ -541,11 +508,11 @@ function addMessage(who, text) {
 function sendMessage() {
   const text = $("message").value.trim();
   if (!text) return;
-  if (!dataChannel || dataChannel.readyState !== "open") {
+  if (!dataConn || dataConn.open !== true) {
     addMessage("System", "Chat is not connected yet.");
     return;
   }
-  dataChannel.send(text);
+  dataConn.send(text);
   addMessage("You", text);
   $("message").value = "";
 }
@@ -569,10 +536,10 @@ $("camera").onclick = () => {
   $("camera").textContent = track.enabled ? "Turn camera off" : "Turn camera on";
 };
 
-// Improved screen sharing
+// Screen share
 $("screen").onclick = async () => {
-  if (!pc) {
-    alert("Create or join a call first.");
+  if (!currentCall) {
+    alert("Start or join a call first.");
     return;
   }
 
@@ -583,19 +550,15 @@ $("screen").onclick = async () => {
 
   try {
     screenStream = await navigator.mediaDevices.getDisplayMedia({
-      video: {
-        cursor: "always",
-        width: { ideal: 1920 },
-        height: { ideal: 1080 }
-      },
+      video: { cursor: "always", width: { ideal: 1920 }, height: { ideal: 1080 } },
       audio: false
     });
 
     const track = screenStream.getVideoTracks()[0];
-    const sender = pc.getSenders().find(s => s.track && s.track.kind === "video");
+    const sender = currentCall.peerConnection.getSenders().find(s => s.track?.kind === "video");
 
     if (!sender) {
-      alert("No video track available to replace.");
+      alert("No video track available.");
       screenStream.getTracks().forEach(t => t.stop());
       return;
     }
@@ -607,9 +570,8 @@ $("screen").onclick = async () => {
     $("screen").classList.add("success");
 
     track.onended = () => stopScreenShare();
-
   } catch (e) {
-    // User cancelled
+    // user cancelled
   }
 };
 
@@ -621,9 +583,9 @@ async function stopScreenShare() {
     screenStream = null;
   }
 
-  if (pc && localStream) {
+  if (currentCall && localStream) {
     const camTrack = localStream.getVideoTracks()[0];
-    const sender = pc.getSenders().find(s => s.track && s.track.kind === "video");
+    const sender = currentCall.peerConnection.getSenders().find(s => s.track?.kind === "video");
     if (sender && camTrack) {
       await sender.replaceTrack(camTrack);
     }
@@ -635,7 +597,7 @@ async function stopScreenShare() {
   $("screen").classList.remove("success");
 }
 
-// Fullscreen helpers
+// Fullscreen
 function toggleFullscreen(el) {
   if (!document.fullscreenElement) {
     el.requestFullscreen?.() || el.webkitRequestFullscreen?.();
@@ -644,31 +606,32 @@ function toggleFullscreen(el) {
   }
 }
 
-$("fsLocal").onclick = () => {
-  const wrap = $("local").parentElement;
-  toggleFullscreen(wrap);
-};
-
-$("fsRemote").onclick = () => {
-  const wrap = $("remote").parentElement;
-  toggleFullscreen(wrap);
-};
-
+$("fsLocal").onclick = () => toggleFullscreen($("local").parentElement);
+$("fsRemote").onclick = () => toggleFullscreen($("remote").parentElement);
 $("local").ondblclick = () => $("fsLocal").click();
 $("remote").ondblclick = () => $("fsRemote").click();
 
 $("hangup").onclick = () => {
   stopScreenShare();
-  if (pc) pc.close();
-  pc = null;
-  dataChannel = null;
+  if (currentCall) {
+    currentCall.close();
+    currentCall = null;
+  }
+  if (dataConn) {
+    dataConn.close();
+    dataConn = null;
+  }
+  if (peer) {
+    peer.destroy();
+    peer = null;
+  }
   $("remote").srcObject = null;
-  $("myCode").value = "";
+  $("myCode").textContent = "––––";
   setStatus("Call ended. Create a new call to reconnect.");
 };
 
 window.addEventListener("beforeunload", () => {
-  pc?.close();
+  peer?.destroy();
   localStream?.getTracks().forEach(t => t.stop());
   screenStream?.getTracks().forEach(t => t.stop());
 });
