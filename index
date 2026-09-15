@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Talk With Me</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#111827;color:#f9fafb;min-height:100vh;display:grid;place-items:center}
+.card{width:min(900px,94vw);background:#1f2937;border:1px solid #374151;border-radius:20px;padding:28px;box-shadow:0 20px 60px #0008}
+h1{margin:0 0 8px;font-size:32px}
+p{color:#9ca3af}
+input,textarea,button{font:inherit;border-radius:10px;border:1px solid #4b5563}
+input,textarea{width:100%;background:#111827;color:#fff;padding:12px}
+button{background:#5865f2;color:#fff;padding:11px 16px;border:0;cursor:pointer;font-weight:700}
+button:hover{filter:brightness(1.1)}
+button.secondary{background:#374151}
+.hidden{display:none!important}
+#videos{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:20px 0}
+video{width:100%;aspect-ratio:16/9;background:#000;border-radius:14px;object-fit:cover}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.notice{padding:12px;border-radius:10px;background:#111827;color:#d1d5db;margin-top:12px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;margin:12px 0 7px;color:#d1d5db}
+textarea{min-height:130px;resize:vertical}
+@media(max-width:650px){#videos,.row{grid-template-columns:1fr}.card{padding:20px}}
+</style>
+</head>
+<body>
+<div class="card" id="login">
+  <h1>Talk With Me</h1>
+  <p>Enter the password to open the room.</p>
+  <input id="password" type="password" placeholder="Password">
+  <div class="controls">
+    <button id="unlock">Enter</button>
+  </div>
+  <div id="loginMsg" class="notice hidden"></div>
+</div>
+
+<div class="card hidden" id="app">
+  <h1>Talk With Me</h1>
+  <p>Camera, microphone and screen sharing in your browser.</p>
+
+  <div id="videos">
+    <video id="local" autoplay muted playsinline></video>
+    <video id="remote" autoplay playsinline></video>
+  </div>
+
+  <div class="controls">
+    <button id="mic">Mute mic</button>
+    <button id="camera">Turn camera off</button>
+    <button id="screen">Share screen</button>
+    <button class="secondary" id="stop">Stop media</button>
+  </div>
+
+  <div class="notice">
+    This one-file version is password protected, but a static HTML file cannot provide a private internet signaling server by itself. The connection controls below let two browsers exchange WebRTC connection information manually.
+  </div>
+
+  <div class="row">
+    <div>
+      <label for="offer">Your connection information</label>
+      <textarea id="offer" readonly placeholder="Your offer/answer will appear here"></textarea>
+      <button id="copyOffer">Copy</button>
+    </div>
+    <div>
+      <label for="remoteOffer">Friend's connection information</label>
+      <textarea id="remoteOffer" placeholder="Paste your friend's information here"></textarea>
+      <button id="useRemote">Use information</button>
+    </div>
+  </div>
+
+  <label for="chatInput">Chat</label>
+  <div class="controls">
+    <input id="chatInput" placeholder="Type a message">
+    <button id="send">Send</button>
+  </div>
+  <div id="chat" class="notice">No messages yet.</div>
+</div>
+
+<script>
+const PASSWORD="talkwithme69bro";
+const $=id=>document.getElementById(id);
+
+let pc=null;
+let localStream=null;
+let screenStream=null;
+let channel=null;
+let isCaller=false;
+
+$("unlock").onclick=()=>{
+  if($("password").value===PASSWORD){
+    $("login").classList.add("hidden");
+    $("app").classList.remove("hidden");
+    startMedia();
+  }else{
+    $("loginMsg").textContent="Wrong password.";
+    $("loginMsg").classList.remove("hidden");
+  }
+};
+
+$("password").addEventListener("keydown",e=>{if(e.key==="Enter")$("unlock").click()});
+
+async function startMedia(){
+  try{
+    localStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+    $("local").srcObject=localStream;
+  }catch(e){
+    $("loginMsg").textContent="Camera/microphone permission was not granted. You can still use the connection controls.";
+  }
+}
+
+function setupPeer(){
+  pc=new RTCPeerConnection({
+    iceServers:[
+      {urls:"stun:stun.l.google.com:19302"},
+      {urls:"stun:stun.cloudflare.com:3478"}
+    ]
+  });
+
+  if(localStream){
+    localStream.getTracks().forEach(t=>pc.addTrack(t,localStream));
+  }
+
+  pc.ontrack=e=>{
+    $("remote").srcObject=e.streams[0];
+  };
+
+  pc.onicecandidate=()=>{
+    if(pc.iceGatheringState==="complete"){
+      $("offer").value=btoa(JSON.stringify(pc.localDescription));
+    }
+  };
+
+  pc.ondatachannel=e=>{
+    channel=e.channel;
+    setupChannel();
+  };
+}
+
+function setupChannel(){
+  if(!channel)return;
+  channel.onmessage=e=>addChat("Friend",e.data);
+  channel.onopen=()=>addChat("System","Chat connected.");
+}
+
+$("mic").onclick=()=>{
+  const t=localStream?.getAudioTracks()[0];
+  if(!t)return;
+  t.enabled=!t.enabled;
+  $("mic").textContent=t.enabled?"Mute mic":"Unmute mic";
+};
+
+$("camera").onclick=()=>{
+  const t=localStream?.getVideoTracks()[0];
+  if(!t)return;
+  t.enabled=!t.enabled;
+  $("camera").textContent=t.enabled?"Turn camera off":"Turn camera on";
+};
+
+$("screen").onclick=async()=>{
+  try{
+    screenStream=await navigator.mediaDevices.getDisplayMedia({video:true});
+    const screenTrack=screenStream.getVideoTracks()[0];
+    const sender=pc?.getSenders().find(s=>s.track?.kind==="video");
+    if(sender)await sender.replaceTrack(screenTrack);
+    $("local").srcObject=screenStream;
+    screenTrack.onended=async()=>{
+      const camera=localStream?.getVideoTracks()[0];
+      if(sender&&camera){
+        await sender.replaceTrack(camera);
+        $("local").srcObject=localStream;
+      }
+    };
+  }catch(e){}
+};
+
+$("stop").onclick=()=>{
+  localStream?.getTracks().forEach(t=>t.stop());
+  screenStream?.getTracks().forEach(t=>t.stop());
+  $("local").srcObject=null;
+};
+
+$("copyOffer").onclick=async()=>{
+  await navigator.clipboard.writeText($("offer").value);
+};
+
+$("useRemote").onclick=async()=>{
+  try{
+    const desc=JSON.parse(atob($("remoteOffer").value.trim()));
+    if(!pc)setupPeer();
+
+    if(desc.type==="offer"){
+      await pc.setRemoteDescription(desc);
+      channel=pc.createDataChannel("chat");
+      setupChannel();
+      const answer=await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+    }else if(desc.type==="answer"){
+      await pc.setRemoteDescription(desc);
+    }
+    addChat("System","Connection information applied.");
+  }catch(e){
+    alert("That connection information is invalid.");
+  }
+};
+
+$("send").onclick=sendChat;
+$("chatInput").addEventListener("keydown",e=>{if(e.key==="Enter")sendChat()});
+
+function sendChat(){
+  const text=$("chatInput").value.trim();
+  if(!text)return;
+  if(!channel||channel.readyState!=="open"){
+    addChat("System","Chat is not connected yet.");
+    return;
+  }
+  channel.send(text);
+  addChat("You",text);
+  $("chatInput").value="";
+}
+
+function addChat(name,text){
+  if($("chat").textContent==="No messages yet.")$("chat").textContent="";
+  const line=document.createElement("div");
+  line.textContent=name+": "+text;
+  line.style.margin="5px 0";
+  $("chat").appendChild(line);
+}
+
+setupPeer();
+</script>
+</body>
+</html>
