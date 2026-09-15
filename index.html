@@ -7,17 +7,19 @@
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
   :root {
-    --bg: #0b0f19;
-    --card: #151b2d;
-    --border: #2a3348;
-    --text: #f1f5f9;
-    --muted: #94a3b8;
-    --accent: #6366f1;
-    --accent-hover: #818cf8;
-    --danger: #ef4444;
-    --danger-hover: #f87171;
-    --success: #22c55e;
-    --radius: 16px;
+    --bg: #1e1f22;
+    --sidebar: #2b2d31;
+    --card: #2b2d31;
+    --input: #1e1f22;
+    --border: #3f4147;
+    --text: #dbdee1;
+    --muted: #b5bac1;
+    --accent: #5865f2;
+    --accent-hover: #4752c4;
+    --danger: #ed4245;
+    --danger-hover: #c03537;
+    --success: #23a559;
+    --radius: 8px;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -25,108 +27,156 @@
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: "gg sans", "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
     min-height: 100vh;
-    padding: 20px;
-    line-height: 1.5;
+    padding: 0;
+    line-height: 1.4;
   }
 
-  main { max-width: 1100px; margin: 0 auto; }
+  /* Top bar like Discord */
+  .topbar {
+    background: var(--sidebar);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+  .user-info:hover { background: #35373c; }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .username {
+    font-weight: 600;
+    font-size: 15px;
+  }
+
+  .status-dot {
+    width: 10px;
+    height: 10px;
+    background: var(--success);
+    border-radius: 50%;
+    border: 2px solid var(--sidebar);
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+  }
+
+  .avatar-wrap { position: relative; }
+
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+  }
 
   .card {
     background: var(--card);
-    border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 22px;
-    margin-bottom: 18px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+    padding: 20px;
+    margin-bottom: 16px;
   }
 
-  h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 6px; }
-  h2 { font-size: 1.15rem; font-weight: 600; margin-bottom: 12px; color: #e2e8f0; }
-  p { color: var(--muted); margin-bottom: 10px; }
-  .small { font-size: 0.85rem; color: var(--muted); }
+  h1 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  h2 { font-size: 16px; font-weight: 700; margin-bottom: 12px; color: var(--text); text-transform: uppercase; letter-spacing: 0.02em; font-size: 12px; color: var(--muted); }
+  p { color: var(--muted); margin-bottom: 10px; font-size: 14px; }
+  .small { font-size: 13px; color: var(--muted); }
 
   input, textarea {
     width: 100%;
-    background: #0f1525;
+    background: var(--input);
     color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px 14px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 10px 12px;
     font: inherit;
+    font-size: 15px;
     transition: border-color 0.15s;
   }
-  input:focus, textarea:focus { outline: none; border-color: var(--accent); }
-
-  textarea {
-    min-height: 70px;
-    resize: vertical;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 1.1rem;
-    letter-spacing: 1px;
-    text-align: center;
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
   }
 
   #friendCode {
-    min-height: 52px;
-    height: 52px;
-    font-size: 1.3rem;
+    font-size: 18px;
     letter-spacing: 3px;
     text-align: center;
     text-transform: uppercase;
+    font-weight: 600;
+    height: 48px;
   }
 
   button {
     border: 0;
-    border-radius: 11px;
-    padding: 11px 16px;
+    border-radius: 4px;
+    padding: 10px 16px;
     background: var(--accent);
     color: white;
-    font-weight: 600;
-    font-size: 0.95rem;
+    font-weight: 500;
+    font-size: 14px;
     cursor: pointer;
-    transition: background 0.15s, transform 0.1s;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+    transition: background 0.15s;
   }
   button:hover:not(:disabled) { background: var(--accent-hover); }
-  button:active:not(:disabled) { transform: scale(0.97); }
-  button:disabled { opacity: 0.45; cursor: not-allowed; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  button.secondary { background: #2d3748; }
-  button.secondary:hover:not(:disabled) { background: #3d4a5f; }
+  button.secondary { background: #4e5058; }
+  button.secondary:hover:not(:disabled) { background: #6d6f78; }
   button.danger { background: var(--danger); }
   button.danger:hover:not(:disabled) { background: var(--danger-hover); }
   button.success { background: var(--success); }
 
-  .controls { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
   .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .hidden { display: none !important; }
 
   .notice {
-    background: #0f1525;
-    border-radius: 12px;
-    padding: 12px 14px;
-    color: #cbd5e1;
-    margin-top: 14px;
-    font-size: 0.95rem;
+    background: var(--input);
+    border-radius: 4px;
+    padding: 10px 12px;
+    color: var(--muted);
+    margin-top: 12px;
+    font-size: 14px;
   }
 
-  .status { font-weight: 600; color: #a5b4fc; margin-bottom: 8px; }
+  .status { font-weight: 500; color: #00a8fc; margin-bottom: 6px; font-size: 14px; }
 
+  /* Videos */
   #videos {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-bottom: 14px;
+    gap: 12px;
+    margin-bottom: 12px;
   }
 
   .video-wrap {
     position: relative;
-    background: #000;
-    border-radius: 14px;
+    background: #111214;
+    border-radius: 8px;
     overflow: hidden;
     aspect-ratio: 16/9;
   }
@@ -135,81 +185,162 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    background: #000;
+    background: #111214;
     display: block;
   }
 
   .video-label {
     position: absolute;
-    top: 10px;
+    bottom: 10px;
     left: 10px;
-    background: rgba(0,0,0,0.65);
+    background: rgba(0,0,0,0.7);
     color: white;
-    font-size: 0.75rem;
+    font-size: 13px;
     font-weight: 600;
     padding: 4px 10px;
-    border-radius: 8px;
-    pointer-events: none;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .video-label .mini-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    object-fit: cover;
   }
 
   .video-actions {
     position: absolute;
-    bottom: 10px;
+    top: 10px;
     right: 10px;
     display: flex;
     gap: 6px;
   }
 
   .video-actions button {
-    padding: 7px 10px;
-    font-size: 0.8rem;
-    border-radius: 8px;
-    background: rgba(0,0,0,0.7);
+    padding: 6px 10px;
+    font-size: 12px;
+    background: rgba(0,0,0,0.6);
   }
-  .video-actions button:hover { background: rgba(99,102,241,0.9); }
+  .video-actions button:hover { background: var(--accent); }
 
+  /* Chat */
   #chat {
-    height: 240px;
+    height: 260px;
     overflow-y: auto;
-    background: #0f1525;
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 12px;
-    border: 1px solid var(--border);
+    background: var(--input);
+    border-radius: 4px;
+    padding: 12px;
+    margin-bottom: 10px;
   }
 
-  .msg { margin: 8px 0; line-height: 1.4; }
-  .msg b { color: #a5b4fc; }
-  .msg.system { color: var(--muted); font-style: italic; }
+  .msg {
+    margin: 10px 0;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
 
+  .msg .msg-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+  }
+
+  .msg-body { flex: 1; }
+  .msg-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px; }
+  .msg-author { font-weight: 600; font-size: 14px; color: var(--text); }
+  .msg-time { font-size: 11px; color: var(--muted); }
+  .msg-text { font-size: 14px; color: var(--text); word-break: break-word; }
+
+  .msg.system .msg-text { color: var(--muted); font-style: italic; }
+
+  /* Gate */
   #gate {
-    max-width: 420px;
-    margin: 80px auto;
+    max-width: 400px;
+    margin: 100px auto;
     text-align: center;
   }
   #gate input { text-align: center; margin: 16px 0; }
 
+  /* Profile modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+  .modal {
+    background: var(--card);
+    border-radius: 8px;
+    padding: 24px;
+    width: 90%;
+    max-width: 400px;
+  }
+  .modal h2 { font-size: 20px; text-transform: none; color: var(--text); margin-bottom: 16px; }
+  .modal label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; }
+  .modal .avatar-preview {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 16px;
+    object-fit: cover;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 600;
+    color: white;
+  }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+
   .big-id {
-    font-size: 2rem;
+    font-size: 28px;
     font-weight: 700;
     letter-spacing: 4px;
     text-align: center;
     padding: 16px;
-    background: #0f1525;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    margin: 12px 0;
+    background: var(--input);
+    border-radius: 4px;
+    margin: 8px 0;
     user-select: all;
   }
 
   @media (max-width: 750px) {
     .row, #videos { grid-template-columns: 1fr; }
-    body { padding: 12px; }
-    .card { padding: 16px; }
+    main { padding: 12px; }
   }
 </style>
 </head>
 <body>
+
+<!-- Top bar -->
+<div class="topbar" id="topbar" style="display:none">
+  <div class="user-info" id="openProfile">
+    <div class="avatar-wrap">
+      <div class="avatar" id="topAvatar">?</div>
+      <div class="status-dot"></div>
+    </div>
+    <span class="username" id="topUsername">Guest</span>
+  </div>
+  <div style="font-size:13px;color:var(--muted)">Talk With Me</div>
+</div>
+
 <main>
   <!-- Password gate -->
   <div class="card" id="gate">
@@ -225,9 +356,7 @@
   <!-- Main app -->
   <div id="app" class="hidden">
     <div class="card">
-      <h1>Talk With Me</h1>
       <div class="status" id="status">Ready.</div>
-      <p class="small">Password: talkwithme69bro</p>
       <div class="controls">
         <button id="start">Start camera & mic</button>
         <button id="create">Create call</button>
@@ -237,19 +366,19 @@
 
     <div class="card">
       <h2>Connection</h2>
-      <p class="small">Share the short code with your friend. No long base64 needed.</p>
+      <p class="small">Share the short code with your friend.</p>
 
       <div class="row">
         <div>
-          <p><b>Your code</b></p>
+          <p style="margin-bottom:4px"><b>Your code</b></p>
           <div id="myCode" class="big-id">––––</div>
           <div class="controls">
-            <button id="copy">Copy my code</button>
+            <button id="copy">Copy code</button>
           </div>
         </div>
         <div>
-          <p><b>Friend's code</b></p>
-          <input id="friendCode" placeholder="e.g. 4HA8" maxlength="6" autocomplete="off">
+          <p style="margin-bottom:4px"><b>Friend's code</b></p>
+          <input id="friendCode" placeholder="4HA8" maxlength="6" autocomplete="off">
           <div class="controls">
             <button id="apply">Join / Connect</button>
           </div>
@@ -263,39 +392,63 @@
       <div id="videos">
         <div class="video-wrap">
           <video id="local" autoplay muted playsinline></video>
-          <div class="video-label">You</div>
+          <div class="video-label" id="localLabel">
+            <span>You</span>
+          </div>
           <div class="video-actions">
             <button id="fsLocal">Fullscreen</button>
           </div>
         </div>
         <div class="video-wrap">
           <video id="remote" autoplay playsinline></video>
-          <div class="video-label">Friend</div>
+          <div class="video-label" id="remoteLabel">
+            <span>Friend</span>
+          </div>
           <div class="video-actions">
             <button id="fsRemote">Fullscreen</button>
           </div>
         </div>
       </div>
       <div class="controls">
-        <button id="mic">Mute mic</button>
-        <button id="camera">Turn camera off</button>
-        <button id="screen">Share screen</button>
-        <button id="hangup" class="danger">Hang up</button>
+        <button id="mic">Mute</button>
+        <button id="camera">Camera Off</button>
+        <button id="screen">Share Screen</button>
+        <button id="hangup" class="danger">Disconnect</button>
       </div>
     </div>
 
     <div class="card">
       <h2>Chat</h2>
       <div id="chat">
-        <div class="small">Chat messages appear here after the connection is established.</div>
+        <div class="small" style="padding:8px">Messages will appear here once connected.</div>
       </div>
       <div class="controls">
-        <input id="message" placeholder="Type a message…" style="flex:1">
+        <input id="message" placeholder="Message..." style="flex:1">
         <button id="send">Send</button>
       </div>
     </div>
   </div>
 </main>
+
+<!-- Profile Modal -->
+<div class="modal-overlay hidden" id="profileModal">
+  <div class="modal">
+    <h2>Edit Profile</h2>
+    
+    <div class="avatar-preview" id="previewAvatar">?</div>
+    
+    <label>Profile Picture</label>
+    <input type="file" id="avatarInput" accept="image/*" style="margin-bottom:16px">
+    
+    <label>Username</label>
+    <input id="usernameInput" placeholder="Your name" maxlength="24" style="margin-bottom:8px">
+    
+    <div class="modal-actions">
+      <button class="secondary" id="closeProfile">Cancel</button>
+      <button id="saveProfile">Save</button>
+    </div>
+  </div>
+</div>
 
 <script>
 const PASSWORD = "talkwithme69bro";
@@ -309,17 +462,80 @@ let screenStream = null;
 let isScreenSharing = false;
 let myId = null;
 
+// Profile
+let username = localStorage.getItem("twm_username") || "Guest";
+let avatarData = localStorage.getItem("twm_avatar") || "";
+
+function updateProfileUI() {
+  $("topUsername").textContent = username;
+  $("usernameInput").value = username;
+
+  const avatars = [$("topAvatar"), $("previewAvatar")];
+  avatars.forEach(el => {
+    if (avatarData) {
+      el.innerHTML = `<img src="${avatarData}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+    } else {
+      el.textContent = username.charAt(0).toUpperCase();
+      el.style.background = stringToColor(username);
+    }
+  });
+
+  // Update local video label
+  const localLabel = $("localLabel");
+  localLabel.innerHTML = "";
+  if (avatarData) {
+    const img = document.createElement("img");
+    img.src = avatarData;
+    img.className = "mini-avatar";
+    localLabel.appendChild(img);
+  }
+  const span = document.createElement("span");
+  span.textContent = username;
+  localLabel.appendChild(span);
+}
+
+function stringToColor(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  const colors = ["#5865f2","#57f287","#fee75c","#eb459e","#ed4245","#3ba55d","#faa81a"];
+  return colors[Math.abs(hash) % colors.length];
+}
+
+// Profile modal
+$("openProfile").onclick = () => {
+  $("profileModal").classList.remove("hidden");
+  updateProfileUI();
+};
+$("closeProfile").onclick = () => $("profileModal").classList.add("hidden");
+
+$("avatarInput").onchange = e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    avatarData = ev.target.result;
+    updateProfileUI();
+  };
+  reader.readAsDataURL(file);
+};
+
+$("saveProfile").onclick = () => {
+  username = $("usernameInput").value.trim() || "Guest";
+  localStorage.setItem("twm_username", username);
+  localStorage.setItem("twm_avatar", avatarData);
+  updateProfileUI();
+  $("profileModal").classList.add("hidden");
+};
+
 function setStatus(text) {
   $("status").textContent = text;
   $("connectionMsg").textContent = text;
 }
 
 function generateShortId(length = 4) {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no 0/O/1/I
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   let id = "";
-  for (let i = 0; i < length; i++) {
-    id += chars[Math.floor(Math.random() * chars.length)];
-  }
+  for (let i = 0; i < length; i++) id += chars[Math.floor(Math.random() * chars.length)];
   return id;
 }
 
@@ -331,6 +547,8 @@ $("enter").onclick = () => {
   }
   $("gate").classList.add("hidden");
   $("app").classList.remove("hidden");
+  $("topbar").style.display = "flex";
+  updateProfileUI();
 };
 
 $("password").addEventListener("keydown", e => {
@@ -358,9 +576,7 @@ function createPeer(id) {
     peer = null;
   }
 
-  peer = new Peer(id, {
-    debug: 1
-  });
+  peer = new Peer(id, { debug: 1 });
 
   peer.on("open", id => {
     myId = id;
@@ -371,15 +587,12 @@ function createPeer(id) {
   peer.on("error", err => {
     console.error(err);
     if (err.type === "unavailable-id") {
-      // retry with new id
-      const newId = generateShortId();
-      createPeer(newId);
+      createPeer(generateShortId());
     } else {
       setStatus("Error: " + err.type);
     }
   });
 
-  // Incoming call
   peer.on("call", async call => {
     await getMedia();
     call.answer(localStream);
@@ -396,7 +609,6 @@ function createPeer(id) {
     });
   });
 
-  // Incoming data connection (chat)
   peer.on("connection", conn => {
     dataConn = conn;
     setupDataChannel(conn);
@@ -404,10 +616,14 @@ function createPeer(id) {
 }
 
 function setupDataChannel(conn) {
-  conn.on("open", () => {
-    setStatus("Connected — chat is ready.");
+  conn.on("open", () => setStatus("Connected — chat is ready."));
+  conn.on("data", data => {
+    if (typeof data === "object" && data.type === "chat") {
+      addMessage(data.username || "Friend", data.text, data.avatar);
+    } else {
+      addMessage("Friend", data);
+    }
   });
-  conn.on("data", data => addMessage("Friend", data));
   conn.on("close", () => addMessage("System", "Chat disconnected."));
 }
 
@@ -420,8 +636,7 @@ $("start").onclick = async () => {
 $("create").onclick = async () => {
   try {
     await getMedia();
-    const id = generateShortId(4);
-    createPeer(id);
+    createPeer(generateShortId(4));
     setStatus("Creating your call code…");
   } catch (e) {
     alert("Could not start.");
@@ -430,7 +645,7 @@ $("create").onclick = async () => {
 
 $("join").onclick = () => {
   $("friendCode").focus();
-  setStatus("Type your friend's 4-character code, then click Join / Connect.");
+  setStatus("Type your friend's code, then click Join / Connect.");
 };
 
 $("apply").onclick = async () => {
@@ -443,14 +658,11 @@ $("apply").onclick = async () => {
   try {
     await getMedia();
 
-    // Create our own peer (random short id)
     if (!peer) {
       createPeer(generateShortId(4));
-      // wait a moment for peer to open
       await new Promise(r => setTimeout(r, 800));
     }
 
-    // Call the remote peer
     const call = peer.call(remoteId, localStream);
     currentCall = call;
 
@@ -464,7 +676,6 @@ $("apply").onclick = async () => {
       $("remote").srcObject = null;
     });
 
-    // Also open a data connection for chat
     dataConn = peer.connect(remoteId);
     setupDataChannel(dataConn);
 
@@ -481,7 +692,6 @@ $("copy").onclick = async () => {
     await navigator.clipboard.writeText(code);
     setStatus("Copied! Send the code to your friend.");
   } catch {
-    // fallback
     const ta = document.createElement("textarea");
     ta.value = code;
     document.body.appendChild(ta);
@@ -492,15 +702,52 @@ $("copy").onclick = async () => {
   }
 };
 
-function addMessage(who, text) {
+function addMessage(who, text, avatar = null) {
   const chat = $("chat");
   if (chat.querySelector(".small")) chat.innerHTML = "";
+
   const div = document.createElement("div");
   div.className = "msg" + (who === "System" ? " system" : "");
-  const b = document.createElement("b");
-  b.textContent = who + ": ";
-  div.appendChild(b);
-  div.appendChild(document.createTextNode(text));
+
+  const av = document.createElement("div");
+  av.className = "msg-avatar";
+  if (avatar) {
+    av.innerHTML = `<img src="${avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+  } else if (who === "You") {
+    if (avatarData) {
+      av.innerHTML = `<img src="${avatarData}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`;
+    } else {
+      av.textContent = username.charAt(0).toUpperCase();
+      av.style.background = stringToColor(username);
+    }
+  } else {
+    av.textContent = who.charAt(0).toUpperCase();
+    av.style.background = stringToColor(who);
+  }
+  div.appendChild(av);
+
+  const body = document.createElement("div");
+  body.className = "msg-body";
+
+  const header = document.createElement("div");
+  header.className = "msg-header";
+  const author = document.createElement("span");
+  author.className = "msg-author";
+  author.textContent = who === "You" ? username : who;
+  const time = document.createElement("span");
+  time.className = "msg-time";
+  time.textContent = new Date().toLocaleTimeString([], {hour: "2-digit", minute:"2-digit"});
+  header.appendChild(author);
+  header.appendChild(time);
+
+  const txt = document.createElement("div");
+  txt.className = "msg-text";
+  txt.textContent = text;
+
+  body.appendChild(header);
+  body.appendChild(txt);
+  div.appendChild(body);
+
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
 }
@@ -508,11 +755,16 @@ function addMessage(who, text) {
 function sendMessage() {
   const text = $("message").value.trim();
   if (!text) return;
-  if (!dataConn || dataConn.open !== true) {
+  if (!dataConn || !dataConn.open) {
     addMessage("System", "Chat is not connected yet.");
     return;
   }
-  dataConn.send(text);
+  dataConn.send({
+    type: "chat",
+    username: username,
+    text: text,
+    avatar: avatarData || null
+  });
   addMessage("You", text);
   $("message").value = "";
 }
@@ -526,78 +778,63 @@ $("mic").onclick = () => {
   const track = localStream?.getAudioTracks()[0];
   if (!track) return;
   track.enabled = !track.enabled;
-  $("mic").textContent = track.enabled ? "Mute mic" : "Unmute mic";
+  $("mic").textContent = track.enabled ? "Mute" : "Unmute";
 };
 
 $("camera").onclick = () => {
   const track = localStream?.getVideoTracks()[0];
   if (!track) return;
   track.enabled = !track.enabled;
-  $("camera").textContent = track.enabled ? "Turn camera off" : "Turn camera on";
+  $("camera").textContent = track.enabled ? "Camera Off" : "Camera On";
 };
 
-// Screen share
 $("screen").onclick = async () => {
   if (!currentCall) {
     alert("Start or join a call first.");
     return;
   }
-
   if (isScreenSharing) {
     stopScreenShare();
     return;
   }
-
   try {
     screenStream = await navigator.mediaDevices.getDisplayMedia({
       video: { cursor: "always", width: { ideal: 1920 }, height: { ideal: 1080 } },
       audio: false
     });
-
     const track = screenStream.getVideoTracks()[0];
     const sender = currentCall.peerConnection.getSenders().find(s => s.track?.kind === "video");
-
     if (!sender) {
       alert("No video track available.");
       screenStream.getTracks().forEach(t => t.stop());
       return;
     }
-
     await sender.replaceTrack(track);
     $("local").srcObject = screenStream;
     isScreenSharing = true;
-    $("screen").textContent = "Stop screen share";
+    $("screen").textContent = "Stop Sharing";
     $("screen").classList.add("success");
-
     track.onended = () => stopScreenShare();
-  } catch (e) {
-    // user cancelled
-  }
+  } catch (e) {}
 };
 
 async function stopScreenShare() {
   if (!isScreenSharing) return;
-
   if (screenStream) {
     screenStream.getTracks().forEach(t => t.stop());
     screenStream = null;
   }
-
   if (currentCall && localStream) {
     const camTrack = localStream.getVideoTracks()[0];
     const sender = currentCall.peerConnection.getSenders().find(s => s.track?.kind === "video");
-    if (sender && camTrack) {
-      await sender.replaceTrack(camTrack);
-    }
+    if (sender && camTrack) await sender.replaceTrack(camTrack);
     $("local").srcObject = localStream;
   }
-
   isScreenSharing = false;
-  $("screen").textContent = "Share screen";
+  $("screen").textContent = "Share Screen";
   $("screen").classList.remove("success");
 }
 
-// Fullscreen
 function toggleFullscreen(el) {
   if (!document.fullscreenElement) {
     el.requestFullscreen?.() || el.webkitRequestFullscreen?.();
@@ -613,18 +850,9 @@ $("remote").ondblclick = () => $("fsRemote").click();
 
 $("hangup").onclick = () => {
   stopScreenShare();
-  if (currentCall) {
-    currentCall.close();
-    currentCall = null;
-  }
-  if (dataConn) {
-    dataConn.close();
-    dataConn = null;
-  }
-  if (peer) {
-    peer.destroy();
-    peer = null;
-  }
+  if (currentCall) { currentCall.close(); currentCall = null; }
+  if (dataConn) { dataConn.close(); dataConn = null; }
+  if (peer) { peer.destroy(); peer = null; }
   $("remote").srcObject = null;
   $("myCode").textContent = "––––";
   setStatus("Call ended. Create a new call to reconnect.");
@@ -635,6 +863,9 @@ window.addEventListener("beforeunload", () => {
   localStream?.getTracks().forEach(t => t.stop());
   screenStream?.getTracks().forEach(t => t.stop());
 });
+
+// Init
+updateProfileUI();
 </script>
 </body>
 </html>
