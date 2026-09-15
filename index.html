@@ -6,77 +6,95 @@
 <title>Talk With Me</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#111827;color:#f9fafb;min-height:100vh;display:grid;place-items:center}
-.card{width:min(900px,94vw);background:#1f2937;border:1px solid #374151;border-radius:20px;padding:28px;box-shadow:0 20px 60px #0008}
-h1{margin:0 0 8px;font-size:32px}
-p{color:#9ca3af}
-input,textarea,button{font:inherit;border-radius:10px;border:1px solid #4b5563}
-input,textarea{width:100%;background:#111827;color:#fff;padding:12px}
-button{background:#5865f2;color:#fff;padding:11px 16px;border:0;cursor:pointer;font-weight:700}
-button:hover{filter:brightness(1.1)}
+body{margin:0;background:#111827;color:#f9fafb;font-family:system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh;padding:24px}
+main{max-width:1000px;margin:auto}
+.card{background:#1f2937;border:1px solid #374151;border-radius:18px;padding:20px;margin-bottom:16px}
+h1,h2{margin-top:0}
+p{color:#aeb7c5}
+input,textarea,button{font:inherit}
+input,textarea{width:100%;background:#111827;color:#fff;border:1px solid #4b5563;border-radius:10px;padding:12px}
+textarea{min-height:150px;resize:vertical}
+button{border:0;border-radius:10px;padding:11px 15px;background:#5865f2;color:#fff;font-weight:700;cursor:pointer}
 button.secondary{background:#374151}
-.hidden{display:none!important}
-#videos{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:20px 0}
+button.danger{background:#b91c1c}
+button:disabled{opacity:.5;cursor:not-allowed}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.hidden{display:none}
+.notice{background:#111827;border-radius:10px;padding:12px;color:#d1d5db;margin-top:12px}
+#videos{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 video{width:100%;aspect-ratio:16/9;background:#000;border-radius:14px;object-fit:cover}
-.controls{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
-.notice{padding:12px;border-radius:10px;background:#111827;color:#d1d5db;margin-top:12px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-label{display:block;margin:12px 0 7px;color:#d1d5db}
-textarea{min-height:130px;resize:vertical}
-@media(max-width:650px){#videos,.row{grid-template-columns:1fr}.card{padding:20px}}
+#chat{height:220px;overflow:auto;background:#111827;border-radius:10px;padding:12px}
+.msg{margin:7px 0}
+.small{font-size:13px;color:#9ca3af}
+.status{font-weight:700}
+@media(max-width:700px){.row,#videos{grid-template-columns:1fr}body{padding:12px}}
 </style>
 </head>
 <body>
-<div class="card" id="login">
-  <h1>Talk With Me</h1>
-  <p>Enter the password to open the room.</p>
-  <input id="password" type="password" placeholder="Password">
-  <div class="controls">
-    <button id="unlock">Enter</button>
-  </div>
-  <div id="loginMsg" class="notice hidden"></div>
+<main>
+<div class="card" id="gate">
+<h1>Talk With Me</h1>
+<p>Password protected voice, video, screen sharing and chat.</p>
+<input id="password" type="password" placeholder="Password">
+<div class="controls"><button id="enter">Enter</button></div>
+<div id="gateMsg" class="notice hidden"></div>
 </div>
 
-<div class="card hidden" id="app">
-  <h1>Talk With Me</h1>
-  <p>Camera, microphone and screen sharing in your browser.</p>
-
-  <div id="videos">
-    <video id="local" autoplay muted playsinline></video>
-    <video id="remote" autoplay playsinline></video>
-  </div>
-
-  <div class="controls">
-    <button id="mic">Mute mic</button>
-    <button id="camera">Turn camera off</button>
-    <button id="screen">Share screen</button>
-    <button class="secondary" id="stop">Stop media</button>
-  </div>
-
-  <div class="notice">
-    This one-file version is password protected, but a static HTML file cannot provide a private internet signaling server by itself. The connection controls below let two browsers exchange WebRTC connection information manually.
-  </div>
-
-  <div class="row">
-    <div>
-      <label for="offer">Your connection information</label>
-      <textarea id="offer" readonly placeholder="Your offer/answer will appear here"></textarea>
-      <button id="copyOffer">Copy</button>
-    </div>
-    <div>
-      <label for="remoteOffer">Friend's connection information</label>
-      <textarea id="remoteOffer" placeholder="Paste your friend's information here"></textarea>
-      <button id="useRemote">Use information</button>
-    </div>
-  </div>
-
-  <label for="chatInput">Chat</label>
-  <div class="controls">
-    <input id="chatInput" placeholder="Type a message">
-    <button id="send">Send</button>
-  </div>
-  <div id="chat" class="notice">No messages yet.</div>
+<div id="app" class="hidden">
+<div class="card">
+<h1>Talk With Me</h1>
+<div class="status" id="status">Ready.</div>
+<p class="small">Password: talkwithme69bro</p>
+<div class="controls">
+<button id="start">Start camera & mic</button>
+<button id="create">Create call</button>
+<button id="join" class="secondary">Join with offer</button>
 </div>
+</div>
+
+<div class="card">
+<h2>Connection</h2>
+<p class="small">Because this is one HTML file with no server, the two browsers must exchange these codes manually. Copy your code to your friend. They paste it into the other box and send their answer back.</p>
+<div class="row">
+<div>
+<p><b>Your code</b></p>
+<textarea id="myCode" readonly placeholder="Your offer or answer will appear here"></textarea>
+<div class="controls"><button id="copy">Copy my code</button></div>
+</div>
+<div>
+<p><b>Friend's code</b></p>
+<textarea id="friendCode" placeholder="Paste your friend's code here"></textarea>
+<div class="controls"><button id="apply">Apply friend's code</button></div>
+</div>
+</div>
+<div id="connectionMsg" class="notice">Waiting for a call.</div>
+</div>
+
+<div class="card">
+<h2>Call</h2>
+<div id="videos">
+<video id="local" autoplay muted playsinline></video>
+<video id="remote" autoplay playsinline></video>
+</div>
+<div class="controls">
+<button id="mic">Mute mic</button>
+<button id="camera">Turn camera off</button>
+<button id="screen">Share screen</button>
+<button id="hangup" class="danger">Hang up</button>
+</div>
+</div>
+
+<div class="card">
+<h2>Chat</h2>
+<div id="chat"><div class="small">Chat messages appear here after the connection is established.</div></div>
+<div class="controls">
+<input id="message" placeholder="Type a message">
+<button id="send">Send</button>
+</div>
+</div>
+</div>
+</main>
 
 <script>
 const PASSWORD="talkwithme69bro";
@@ -84,33 +102,45 @@ const $=id=>document.getElementById(id);
 
 let pc=null;
 let localStream=null;
+let dataChannel=null;
+let makingOffer=false;
+let pendingCandidates=[];
 let screenStream=null;
-let channel=null;
-let isCaller=false;
 
-$("unlock").onclick=()=>{
-  if($("password").value===PASSWORD){
-    $("login").classList.add("hidden");
-    $("app").classList.remove("hidden");
-    startMedia();
-  }else{
-    $("loginMsg").textContent="Wrong password.";
-    $("loginMsg").classList.remove("hidden");
+function setStatus(text){
+  $("status").textContent=text;
+  $("connectionMsg").textContent=text;
+}
+
+$("enter").onclick=()=>{
+  if($("password").value!==PASSWORD){
+    $("gateMsg").textContent="Wrong password.";
+    $("gateMsg").classList.remove("hidden");
+    return;
   }
+  $("gate").classList.add("hidden");
+  $("app").classList.remove("hidden");
 };
 
-$("password").addEventListener("keydown",e=>{if(e.key==="Enter")$("unlock").click()});
+$("password").addEventListener("keydown",e=>{
+  if(e.key==="Enter")$("enter").click();
+});
 
-async function startMedia(){
+async function getMedia(){
+  if(localStream)return localStream;
   try{
-    localStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+    localStream=await navigator.mediaDevices.getUserMedia({audio:true,video:true});
     $("local").srcObject=localStream;
+    return localStream;
   }catch(e){
-    $("loginMsg").textContent="Camera/microphone permission was not granted. You can still use the connection controls.";
+    alert("Camera/microphone permission is required for a voice/video call.");
+    throw e;
   }
 }
 
-function setupPeer(){
+function createPeer(){
+  if(pc)return pc;
+
   pc=new RTCPeerConnection({
     iceServers:[
       {urls:"stun:stun.l.google.com:19302"},
@@ -119,116 +149,229 @@ function setupPeer(){
   });
 
   if(localStream){
-    localStream.getTracks().forEach(t=>pc.addTrack(t,localStream));
+    localStream.getTracks().forEach(track=>pc.addTrack(track,localStream));
   }
 
   pc.ontrack=e=>{
-    $("remote").srcObject=e.streams[0];
+    if(e.streams[0])$("remote").srcObject=e.streams[0];
+    setStatus("Connected — you should now hear/see your friend.");
   };
 
-  pc.onicecandidate=()=>{
-    if(pc.iceGatheringState==="complete"){
-      $("offer").value=btoa(JSON.stringify(pc.localDescription));
+  pc.onicecandidate=e=>{
+    if(e.candidate)return;
+    if(pc.localDescription){
+      $("myCode").value=encode(pc.localDescription);
+      setStatus("Your connection code is ready. Send it to your friend.");
     }
   };
 
-  pc.ondatachannel=e=>{
-    channel=e.channel;
-    setupChannel();
+  pc.onconnectionstatechange=()=>{
+    const s=pc.connectionState;
+    if(s==="connected")setStatus("Connected — call is live.");
+    else if(s==="connecting")setStatus("Connecting...");
+    else if(s==="disconnected")setStatus("Connection interrupted.");
+    else if(s==="failed")setStatus("Connection failed. Try creating a new call.");
+    else if(s==="closed")setStatus("Call ended.");
   };
+
+  pc.ondatachannel=e=>{
+    dataChannel=e.channel;
+    setupDataChannel();
+  };
+
+  return pc;
 }
 
-function setupChannel(){
-  if(!channel)return;
-  channel.onmessage=e=>addChat("Friend",e.data);
-  channel.onopen=()=>addChat("System","Chat connected.");
+function encode(obj){
+  return btoa(JSON.stringify(obj));
 }
+
+function decode(text){
+  return JSON.parse(atob(text.trim()));
+}
+
+function waitForIceComplete(){
+  return new Promise(resolve=>{
+    if(!pc||pc.iceGatheringState==="complete"){resolve();return}
+    const done=()=>{
+      if(pc.iceGatheringState==="complete"){
+        pc.removeEventListener("icegatheringstatechange",done);
+        resolve();
+      }
+    };
+    pc.addEventListener("icegatheringstatechange",done);
+    setTimeout(resolve,10000);
+  });
+}
+
+$("start").onclick=async()=>{
+  await getMedia();
+  createPeer();
+  $("start").disabled=true;
+  setStatus("Camera and microphone ready.");
+};
+
+$("create").onclick=async()=>{
+  try{
+    await getMedia();
+    createPeer();
+    dataChannel=pc.createDataChannel("chat");
+    setupDataChannel();
+    makingOffer=true;
+    const offer=await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    setStatus("Preparing your call code...");
+    await waitForIceComplete();
+    $("myCode").value=encode(pc.localDescription);
+    makingOffer=false;
+    setStatus("Call code ready. Send it to your friend.");
+  }catch(e){
+    makingOffer=false;
+    alert("Could not create the call.");
+  }
+};
+
+$("join").onclick=async()=>{
+  $("friendCode").focus();
+  setStatus("Paste your friend's call code, then click Apply friend's code.");
+};
+
+$("apply").onclick=async()=>{
+  try{
+    const desc=decode($("friendCode").value);
+    await getMedia();
+    createPeer();
+
+    if(desc.type==="offer"){
+      await pc.setRemoteDescription(desc);
+      for(const c of pendingCandidates){
+        try{await pc.addIceCandidate(c)}catch(e){}
+      }
+      pendingCandidates=[];
+      const answer=await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      setStatus("Preparing your answer code...");
+      await waitForIceComplete();
+      $("myCode").value=encode(pc.localDescription);
+      setStatus("Answer ready. Send your answer code back to the caller.");
+    }else if(desc.type==="answer"){
+      await pc.setRemoteDescription(desc);
+      for(const c of pendingCandidates){
+        try{await pc.addIceCandidate(c)}catch(e){}
+      }
+      pendingCandidates=[];
+      setStatus("Connecting to your friend...");
+    }else{
+      throw new Error("Invalid type");
+    }
+  }catch(e){
+    alert("Invalid connection code. Copy the complete code and try again.");
+  }
+};
+
+$("copy").onclick=async()=>{
+  if(!$("myCode").value)return;
+  try{
+    await navigator.clipboard.writeText($("myCode").value);
+    setStatus("Copied. Send the code to your friend.");
+  }catch(e){
+    $("myCode").select();
+    document.execCommand("copy");
+  }
+};
+
+function setupDataChannel(){
+  if(!dataChannel)return;
+  dataChannel.onopen=()=>setStatus("Connected — chat is ready.");
+  dataChannel.onclose=()=>addMessage("System","Chat disconnected.");
+  dataChannel.onerror=()=>addMessage("System","Chat error.");
+  dataChannel.onmessage=e=>addMessage("Friend",e.data);
+}
+
+function addMessage(who,text){
+  const chat=$("chat");
+  if(chat.querySelector(".small"))chat.innerHTML="";
+  const div=document.createElement("div");
+  div.className="msg";
+  const b=document.createElement("b");
+  b.textContent=who+": ";
+  div.appendChild(b);
+  div.appendChild(document.createTextNode(text));
+  chat.appendChild(div);
+  chat.scrollTop=chat.scrollHeight;
+}
+
+function sendMessage(){
+  const text=$("message").value.trim();
+  if(!text)return;
+  if(!dataChannel||dataChannel.readyState!=="open"){
+    addMessage("System","Chat is not connected yet.");
+    return;
+  }
+  dataChannel.send(text);
+  addMessage("You",text);
+  $("message").value="";
+}
+
+$("send").onclick=sendMessage;
+$("message").addEventListener("keydown",e=>{
+  if(e.key==="Enter")sendMessage();
+});
 
 $("mic").onclick=()=>{
-  const t=localStream?.getAudioTracks()[0];
-  if(!t)return;
-  t.enabled=!t.enabled;
-  $("mic").textContent=t.enabled?"Mute mic":"Unmute mic";
+  const track=localStream?.getAudioTracks()[0];
+  if(!track)return;
+  track.enabled=!track.enabled;
+  $("mic").textContent=track.enabled?"Mute mic":"Unmute mic";
 };
 
 $("camera").onclick=()=>{
-  const t=localStream?.getVideoTracks()[0];
-  if(!t)return;
-  t.enabled=!t.enabled;
-  $("camera").textContent=t.enabled?"Turn camera off":"Turn camera on";
+  const track=localStream?.getVideoTracks()[0];
+  if(!track)return;
+  track.enabled=!track.enabled;
+  $("camera").textContent=track.enabled?"Turn camera off":"Turn camera on";
 };
 
 $("screen").onclick=async()=>{
+  if(!pc){
+    alert("Create or join a call first.");
+    return;
+  }
   try{
     screenStream=await navigator.mediaDevices.getDisplayMedia({video:true});
-    const screenTrack=screenStream.getVideoTracks()[0];
-    const sender=pc?.getSenders().find(s=>s.track?.kind==="video");
-    if(sender)await sender.replaceTrack(screenTrack);
+    const track=screenStream.getVideoTracks()[0];
+    const sender=pc.getSenders().find(s=>s.track&&s.track.kind==="video");
+    if(!sender){
+      alert("Camera/video is not available.");
+      screenStream.getTracks().forEach(t=>t.stop());
+      return;
+    }
+    await sender.replaceTrack(track);
     $("local").srcObject=screenStream;
-    screenTrack.onended=async()=>{
-      const camera=localStream?.getVideoTracks()[0];
-      if(sender&&camera){
-        await sender.replaceTrack(camera);
+    track.onended=async()=>{
+      if(localStream){
+        const cam=localStream.getVideoTracks()[0];
+        await sender.replaceTrack(cam);
         $("local").srcObject=localStream;
       }
     };
   }catch(e){}
 };
 
-$("stop").onclick=()=>{
+$("hangup").onclick=()=>{
+  if(pc)pc.close();
+  pc=null;
+  dataChannel=null;
+  $("remote").srcObject=null;
+  $("myCode").value="";
+  setStatus("Call ended. Create a new call to reconnect.");
+};
+
+window.addEventListener("beforeunload",()=>{
+  pc?.close();
   localStream?.getTracks().forEach(t=>t.stop());
   screenStream?.getTracks().forEach(t=>t.stop());
-  $("local").srcObject=null;
-};
-
-$("copyOffer").onclick=async()=>{
-  await navigator.clipboard.writeText($("offer").value);
-};
-
-$("useRemote").onclick=async()=>{
-  try{
-    const desc=JSON.parse(atob($("remoteOffer").value.trim()));
-    if(!pc)setupPeer();
-
-    if(desc.type==="offer"){
-      await pc.setRemoteDescription(desc);
-      channel=pc.createDataChannel("chat");
-      setupChannel();
-      const answer=await pc.createAnswer();
-      await pc.setLocalDescription(answer);
-    }else if(desc.type==="answer"){
-      await pc.setRemoteDescription(desc);
-    }
-    addChat("System","Connection information applied.");
-  }catch(e){
-    alert("That connection information is invalid.");
-  }
-};
-
-$("send").onclick=sendChat;
-$("chatInput").addEventListener("keydown",e=>{if(e.key==="Enter")sendChat()});
-
-function sendChat(){
-  const text=$("chatInput").value.trim();
-  if(!text)return;
-  if(!channel||channel.readyState!=="open"){
-    addChat("System","Chat is not connected yet.");
-    return;
-  }
-  channel.send(text);
-  addChat("You",text);
-  $("chatInput").value="";
-}
-
-function addChat(name,text){
-  if($("chat").textContent==="No messages yet.")$("chat").textContent="";
-  const line=document.createElement("div");
-  line.textContent=name+": "+text;
-  line.style.margin="5px 0";
-  $("chat").appendChild(line);
-}
-
-setupPeer();
+});
 </script>
 </body>
 </html>
